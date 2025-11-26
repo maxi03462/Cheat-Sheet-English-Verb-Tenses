@@ -1,0 +1,35 @@
+name: Build LaTeX and deploy PDF
+
+on:
+  push:
+    branches:
+      - main   # o la rama que uses
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: cheatSheat.tex   # archivo principal
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload PDF for Pages
+        # asume que el PDF generado es cheatSheat.pdf
+        run: |
+          mkdir -p public
+          cp cheatSheat.pdf public/
+        # ahora public/ contendrá el PDF
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
