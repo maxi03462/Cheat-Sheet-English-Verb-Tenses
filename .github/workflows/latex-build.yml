@@ -6,34 +6,33 @@ on:
       - master   # o la rama que uses
 
 jobs:
-  build:
+  build_and_publish:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pages: write
       id-token: write
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Compile LaTeX
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Compile LaTeX → PDF (opcional)
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: cheatSheat.tex   # archivo principal
+          root_file: cheatSheat.tex   # o tu .tex principal
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload PDF for Pages
-        # asume que el PDF generado es cheatSheat.pdf
+      - name: Convert LaTeX → HTML using TeX4ht
         run: |
-          mkdir -p public
-          cp cheatSheat.pdf public/
-        # ahora public/ contendrá el PDF
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
+          sudo apt-get update
+          sudo apt-get install -y tex4ht
+          htlatex cheatSheat.tex "xhtml,charset=utf-8" " -cunihtf -utf8"
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v6
+        with:
+          publish_dir: ./   # o la carpeta generada por htlatex (por ejemplo ./)
+          # Opcional: si querés que el PDF también esté disponible
+          # publish_dir: ./  # ajustá según convenga
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # branch: gh-pages    # por defecto peaceiris usa gh-pages
