@@ -3,7 +3,7 @@ name: Build LaTeX and deploy PDF
 on:
   push:
     branches:
-      - main   # o la rama que uses
+      - master   # o la rama que uses
 
 jobs:
   build:
